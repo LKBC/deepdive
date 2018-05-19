@@ -8,7 +8,7 @@ import os, sys
 import divlaw
 import handle_string
 
-CrimeLabel = namedtuple('CrimeLabel', 'p_id, label, type')
+# CrimeLabel = namedtuple('CrimeLabel', 'p_id, label, type')
 
 
 @tsv_extractor
@@ -40,15 +40,28 @@ def supervise(
 	# Penalty signals on the left of candidate mention
 	# PENAL_SIGNALS_LEFT = frozenset(kw_legal_penalty)
 
-	crime = CrimeLabel(mention_id=mention_id, label=None, type=None)
+	# crime = CrimeLabel(mention_id=mention_id, label=None, type=None)
 
 	# Negative rules
 	if label < 0:
-		yield crime._replace(label=1, type="neg:legal_penalty_false")
+		yield [
+			mention_id,
+			-1,
+			"neg:legal_penalty_false"
+		]
+		# yield crime._replace(label=1, type="neg:legal_penalty_false")
 
 
 
 	# Positive rules
 	# Ruile 1:
 	if label > 0:
-		yield crime._replace(label=1, type="pos:legal_penalty_true")
+		yield[
+			mention_id,
+			1,
+			"pos:legal_penalty_true"
+		]
+		# yield crime._replace(label=1, type="pos:legal_penalty_true")
+
+	# else:
+	# 	yield crime._replace(label=0)

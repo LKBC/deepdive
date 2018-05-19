@@ -20,20 +20,20 @@ def get_string(tokens, start, length):
 		return " ".join(word for word in tokens[start + 1: start + length + 1])
 #lấy string trong trường hợp luật hình sự#
 ## lấy string nếu hành vi năm ở giưa câu
-def get_crime_string(tokens, key, length):
-	num_tokens = len(tokens)
-	start = 0
-	temp = 0
-	for temp in range(0,num_tokens):
-		temp_1 = None
-		temp_1 = " ".join(word for word in tokens[temp:temp+length])
-		if(  temp_1 in key):
-			if(temp_1 == "phạt tiền" or temp_1 == "Phạt tiền") :
-				if "nếu" in tokens[temp:len(tokens)]:
-					return temp
-			else:
-				return temp
-	return 0
+# def get_crime_string(tokens, key, length):
+# 	num_tokens = len(tokens)
+# 	start = 0
+# 	temp = 0
+# 	for temp in range(0,num_tokens):
+# 		temp_1 = None
+# 		temp_1 = " ".join(word for word in tokens[temp:temp+length])
+# 		if(  temp_1 in key):
+# 			if(temp_1 == "phạt tiền" or temp_1 == "Phạt tiền") :
+# 				if "nếu" in tokens[temp:len(tokens)]:
+# 					return temp
+# 			else:
+# 				return temp
+# 	return 0
 def find_character(tokens, start, character):
 	i = start + 1
 	num_tokens = len(tokens)
@@ -83,8 +83,8 @@ def extract(
 	phrase_list = None
 
 	# [PENALTY] ... (nếu | đối_với_hành_vi| đối_với trường_hợp | đối_với | trong trường_hợp | đối_với_hành_vi_vi_phạm)
-	KW1 = ["hành_vi", "đối_với", "vi_phạm"]
-	KW2 = ["đối_với trường_hợp", "trong trường_hợp", "phạt tiền", "Phạt tiền"]
+	KW1 = ["hành_vi", "đối_với", "vi_phạm", "trường_hợp"]
+	KW2 = ["phạt tiền", "Phạt tiền"]
 	begin_phrase = None
 	end_phrase = None
 	if get_string(tokens, penalty_end_index, 2) in KW2:
@@ -92,14 +92,14 @@ def extract(
 	elif get_string(tokens, penalty_end_index, 1) in KW1:
 		begin_phrase = penalty_end_index + 2
 
-	elif get_crime_string(tokens, KW2, 2) > 0:
-		begin_phrase = get_crime_string(tokens, KW2, 2)
-		if begin_phrase > penalty_begin_index :
-			begin_phrase = penalty_end_index + 1
-	elif get_crime_string(tokens, KW1, 1) > 0:
-		begin_phrase = get_crime_string(tokens, KW1, 1)
-		if begin_phrase > penalty_begin_index :
-			begin_phrase = penalty_end_index + 1
+	# elif get_crime_string(tokens, KW2, 2) > 0:
+	# 	begin_phrase = get_crime_string(tokens, KW2, 2)
+	# 	if begin_phrase > penalty_begin_index :
+	# 		begin_phrase = penalty_end_index + 1
+	# elif get_crime_string(tokens, KW1, 1) > 0:
+	# 	begin_phrase = get_crime_string(tokens, KW1, 1)
+	# 	if begin_phrase > penalty_begin_index :
+	# 		begin_phrase = penalty_end_index + 1
 
 	if begin_phrase :
 		if is_phrase_list_block(tokens): check = 1

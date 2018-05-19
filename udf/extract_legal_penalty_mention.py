@@ -73,13 +73,18 @@ def extract(
         begin_index = None
         end_index = None
         mention_type = None
-        if tokens[i] == 'tù_chung_thân' and (i + 1) < num_tokens:
+        if (i + 2) < num_tokens and tokens[i] == 'tù' and tokens[i+1] == 'chung_thân' :
             begin_index = i
-            end_index = i
+            end_index = i+1
             mention_type = 'LIFE_IMPRISONMENT'
-        elif tokens[i] == 'tử_hình' or tokens[i] == 'án_tử_hình' or tokens[i] == 'thi_hành_án_tử_hình' or tokens[i] == 'tử_hình':
+        elif tokens[i] == 'tử_hình' :
+        # or tokens[i]+tokens[i+1] == 'án tử_hình' or tokens[i] == 'thi_hành_án_tử_hình' or tokens[i] == 'tử_hình':
             begin_index = i
             end_index = i
+            mention_type = 'CAPITAL_PUNISHMENT'
+        elif (i+2) < num_tokens and tokens[i] == 'án' and tokens[i+1] == 'tử_hình':
+            begin_index = i
+            end_index = i+1
             mention_type = 'CAPITAL_PUNISHMENT'
         elif pos_tags[i] == "M":
             begin_index = i
