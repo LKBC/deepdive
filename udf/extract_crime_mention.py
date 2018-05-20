@@ -84,7 +84,7 @@ def extract(
 
 	# [PENALTY] ... (nếu | đối_với_hành_vi| đối_với trường_hợp | đối_với | trong trường_hợp | đối_với_hành_vi_vi_phạm)
 	KW1 = ["hành_vi", "đối_với", "vi_phạm", "trường_hợp"]
-	KW2 = ["phạt tiền", "Phạt tiền"]
+	KW2 = ["đối_với trường_hợp", "trong trường_hợp", "phạt tiền", "Phạt tiền", "phạt tù", "Phạt tù", "phạt từ"]
 	begin_phrase = None
 	end_phrase = None
 	if get_string(tokens, penalty_end_index, 2) in KW2:
@@ -110,7 +110,7 @@ def extract(
 		begin_index = begin_phrase
 		end_index = end_phrase
 		# generate a mention identifier
-		mention_id = "{}_{}_{}_{}".format(law_id, position, begin_index, end_index)
+		mention_id = "{}_{}_{}_{}_{}".format(law_id, position, begin_index, end_index, sentence_index)
 		mention_text = " ".join(map(lambda k: tokens[k].replace('\\', '\\\\'), range(begin_index, end_index + 1)))
 		mention_type = "IN_ONE_SENTENCE"
 		associated_penalty_id = penalty_id
@@ -129,7 +129,7 @@ def extract(
 		begin_index = begin_phrase
 		end_index = end_phrase
 		# generate a mention identifier
-		mention_id = "{}_{}_{}_{}".format(law_id, position, begin_index, end_index)
+		mention_id = "{}_{}_{}_{}_{}".format(law_id, position, begin_index, end_index, sentence_index)
 
 		mention_text_temp = '\\n'.join(word for word in list_sent[0: len(list_sent)])
 		mention_text = " ".join(map(lambda k: tokens[k].replace('\\', '\\\\'), range(begin_index, end_index + 1)))

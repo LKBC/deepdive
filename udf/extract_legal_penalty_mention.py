@@ -106,7 +106,7 @@ def extract(
         if begin_index and end_index and mention_type:
             i = end_index
             # generate a mention identifier
-            mention_id = "{}_{}_{}_{}".format(doc_id, position, begin_index, end_index)
+            mention_id = "{}_{}_{}_{}_{}".format(doc_id, position, begin_index, end_index, sentence_index)
             mention_text = " ".join(map(lambda k: tokens[k].replace('\\', '\\\\'), range(begin_index, end_index + 1)))
             # Output a tuple for each founded phrase
             yield [
