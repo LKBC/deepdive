@@ -20,6 +20,7 @@ import handle_string
 # heuristic rules for finding positive/negative examples of spouse relationship mentions
 def supervise(
 		mention_id="text",
+		mention_text = "text",
 		mention_begin_index="int", 
 		mention_end_index="int",
 		doc_id="text", 
@@ -27,41 +28,61 @@ def supervise(
 		sentence_index="int", 
 		sentence_text="text",
 		tokens="text[]", 
-		pos_tags="text[]",
-		label = "int"
+		pos_tags="text[]"
 ):
-	# # Read keywords from file
-	# APP_HOME = os.environ['APP_HOME']
-	# kw_non_legal_penalty = map(lambda word: word.strip(), open(APP_HOME + "/udf/dicts/kw_non_crime.txt", 'r').readlines())
-	# kw_legal_penalty = map(lambda word: word.strip(), open(APP_HOME + "/udf/dicts/kw_crime.txt", 'r').readlines())
+	APP_HOME = os.environ['APP_HOME']
+	kw_non_crime = map(lambda word: word.strip(), open(APP_HOME + "/udf/dicts/kw_non_crime.txt", 'r').readlines())
+	kw_crime = map(lambda word: word.strip(), open(APP_HOME + "/udf/dicts/kw_crime.txt", 'r').readlines())
 
-	# Non penalty signals on the left of candidate mention
-	# NON_PENAL_SIGNALS_LEFT = frozenset(kw_non_legal_penalty)
-	# Penalty signals on the left of candidate mention
-	# PENAL_SIGNALS_LEFT = frozenset(kw_legal_penalty)
+	# Non crime signals on the left of candidate mention
+	NON_CRIME_SIGNALS_LEFT = frozenset(kw_non_crime)
+	# crime signals on the left of candidate mention
+	CRIME_SIGNALS_LEFT = frozenset(kw_crime)
 
-	# crime = CrimeLabel(mention_id=mention_id, label=None, type=None)
+	WINDOW_SIZE = 10
+	MAX_PHRASE_LENGTH = 5
+	num_tokens = len(tokens)
 
+	# Get all subsequences of left sentence with WINDOW_SIZE = 10
+	low_tokens = map(lambda token: token.lower(), tokens)
+	left_window = get_left_window(mention_begin_index, low_tokens, WINDOW_SIZE)
+	# right_window = get_right_window(p_end, low_tokens, WINDOW_SIZE)
+	phrases_in_sentence_left = list(get_all_phrases_in_sentence(left_window, MAX_PHRASE_LENGTH))
+
+	# Get candiate mention text
+	candiate_text = " ".join(low_tokens[mention_begin_index:mention_end_index + 1])
+
+
+	
 	# Negative rules
-	if label < 0:
+	# Rule 1: On the left of mention, contains some keywords that appears in kw_non_legal_penalty
+
+	if len(NON_CRIME_SIGNALS_LEFT.intersection(phrases_in_sentence_left)) > 0:
+		yield [
+			mention_id,
+			-1, 
+			"neg:non_crime_signals_left"
+		]
+
+	# Rule 2: The sentence that contains mention is in is too short
+	if num_tokens < 10:
 		yield [
 			mention_id,
 			-1,
-			"neg:legal_penalty_false"
+			"neg:sentence_too_short"
 		]
-		# yield crime._replace(label=1, type="neg:legal_penalty_false")
 
-
-
-	# Positive rules
-	# Ruile 1:
-	if label > 0:
-		yield[
+	if len(mention_text) < 10:
+		yield [
 			mention_id,
-			1,
-			"pos:legal_penalty_true"
+			-1,
+			"neg:crime_mention_too_short"
 		]
-		# yield crime._replace(label=1, type="pos:legal_penalty_true")
-
-	# else:
-	# 	yield crime._replace(label=0)
+	# Positive rules
+	# Ruile 1: on the left of mention, containing some keywords that appears in kw_legal_penalty :
+	if len(CRIME_SIGNALS_LEFT.intersection(phrases_in_sentence_left)) > 0:
+		yield [
+			mention_id,
+			1, 
+			"pos:crime_signals_left"
+		]

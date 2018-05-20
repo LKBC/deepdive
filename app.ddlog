@@ -855,6 +855,7 @@ crime_label(mention_id, 0, NULL) :- crime_mention(mention_id, _, _, _, _, _, _, 
 
 function supervise_crime over(
     mention_id text,
+    mention_text text,
     mention_begin_index int,
     mention_end_index int,
     doc_id text,
@@ -862,21 +863,19 @@ function supervise_crime over(
     sentence_index int,
     sentence_text text,
     tokens text[],
-    pos_tags text[],
-    label int
+    pos_tags text[]
     ) returns (
         mention_id text, label int, rule_id text
     )
     implementation "udf/supervise_crime.py" handles tsv lines.
 crime_label += supervise_crime( 
-                        mention_id, mention_begin_index, mention_end_index, 
-                        doc_id, position, sentence_index, sentence_text, tokens, pos_tags, label ) 
+                        mention_id, mention_text, mention_begin_index, mention_end_index, 
+                        doc_id, position, sentence_index, sentence_text, tokens, pos_tags) 
                 :- crime_mention(
-                        _, _, _, doc_id, position, sentence_index, 
-                        mention_begin_index, mention_end_index, mention_id),
+                        mention_id, mention_text, _, doc_id, position, sentence_index, 
+                        mention_begin_index, mention_end_index, _),
                     sentences_crime(
-                        doc_id, position, sentence_index, sentence_text, tokens, pos_tags, _),
-                    legal_penalty_label_resolved(mention_id, label).
+                        doc_id, position, sentence_index, sentence_text, tokens, pos_tags, _).
 
 # resolve multiple labels by majority vote (summing the labels in {-1,0,1})
 crime_label_resolved(mention_id, SUM(vote)) :- crime_label(mention_id, vote, rule_id).
