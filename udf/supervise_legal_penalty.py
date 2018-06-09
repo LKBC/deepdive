@@ -66,9 +66,6 @@ def supervise(
 	regex_money = re.compile(REGEX_MONEY, re.UNICODE)
 	regex_money_range = re.compile(REGEX_MONEY_RANGE, re.UNICODE)
 
-
-	# legal_penalty = LegalPenaltyLabel(mention_id = mention_id, label=None, type=None)
-
 	# Negative rules
 	# Rule 1: On the left of mention, contains some keywords that appears in kw_non_legal_penalty
 	if len(NON_PENAL_SIGNALS_LEFT.intersection(phrases_in_sentence_left)) > 0:

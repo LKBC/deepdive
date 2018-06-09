@@ -39,11 +39,12 @@ def extract(
 	ddlib.load_dictionary(APP_HOME + "/udf/dicts/kw_non_legal_penalty.txt", dict_id="non_legal_penalty")
 
 	kw_non_legal_penalty = map(lambda word: word.strip(), open(APP_HOME + "/udf/dicts/kw_non_legal_penalty.txt", 'r').readlines())
+	kw_legal_penalty = map(lambda word: word.strip(), open(APP_HOME + "/udf/dicts/kw_legal_penalty.txt", 'r').readlines())
 	# kw_legal_penalty = map(lambda word: word.strip(), open(APP_HOME + "/udf/dicts/kw_legal_penalty.txt", 'r').readlines())
 	# Non penalty signals on the left of candidate mention
 	NON_PENAL_SIGNALS_LEFT = frozenset(kw_non_legal_penalty)
 	# Penalty signals on the right of candidate mention
-	# PENAL_SIGNALS_LEFT = frozenset(kw_legal_penalty)
+	PENAL_SIGNALS_LEFT = frozenset(kw_legal_penalty)
 
 	WINDOW_SIZE = 10
 	MAX_PHRASE_LENGTH = 5
@@ -76,7 +77,9 @@ def extract(
 	# Keywords represent non-legal_penalty appears on the left
 	if len(NON_PENAL_SIGNALS_LEFT.intersection(phrases_in_sentence_left)) > 0:
 		yield [mention_id, 'APPEAR_LEFT_KW_NON_LEGAL_PENALTY']
-
+	# if legal penalty mention have on the left 
+	if len(PENAL_SIGNALS_LEFT.intersection(phrases_in_sentence_left)) > 0:
+		yield [mention_id, 'APPEAR_LEFT_KW_LEGAL_PENALTY']
 	# "phạt tù" appear on the left of mention
 	if "phạt tù" in phrases_in_sentence_left:
 		yield [mention_id, 'APPEAR_LEFT_PHAT_TU']
